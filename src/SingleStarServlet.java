@@ -36,7 +36,10 @@ public class SingleStarservlet extends HttpServlet {
 
         PrintWriter out = response.getWriter();
 
+        // try-with-resouces implements AutoCloseable interface to automatically close connection
         try (Connection conn = dataSource.getConnection()) {
+
+            // One-to-many relationship between actors and movies
             String query = "SELECT * FROM stars AS s, stars_in_movies AS sim, movies AS M" +
                            "WHERE M.id = SIM.movie_id AND SIM.startId = S.id AND s.id = ?";
 
@@ -70,6 +73,12 @@ public class SingleStarservlet extends HttpServlet {
                 jsonArray.add(jsonObject);
             }
 
+            rs.close();
+            statement.close();
+
+            out.write(jsonarray.toString());
+            response.setStatus(200);
+
         } catch (Exception e) {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
@@ -77,6 +86,7 @@ public class SingleStarservlet extends HttpServlet {
 
             request.getServletContext().log("Error:", e);
             request.setStatus(500);
+
         } finally {
             out.close();
         }
