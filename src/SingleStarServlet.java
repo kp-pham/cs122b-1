@@ -26,4 +26,25 @@ public class SingleStarservlet extends HttpServlet {
 
         }
     }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
+
+        String id = request.getParameter("id");
+
+        request.getServletContext().log("getting id: " + id);
+
+        PrintWriter out = response.getWriter();
+
+        try (Connection conn = dataSource.getConnection()) {
+
+        } catch (Exception e) {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("errorMessage", e.getMessage());
+            out.write(jsonObject.toString());
+
+            request.getServletContext().log("Error:", e);
+            request.setStatus(500);
+        }
+    }
 }
