@@ -42,7 +42,7 @@ public class SingleStarServlet extends HttpServlet {
         // try-with-resouces implements AutoCloseable interface to automatically close connection
         try (Connection conn = dataSource.getConnection()) {
             String query = "SELECT S.id, S.name, S.birthYear, " +
-                           "JSON_ARRAYAGG(JSON_OBJECT('id', M.id, 'title', M.title)) AS movies " +
+                           "COALESCE(JSON_ARRAYAGG(JSON_OBJECT('id', M.id, 'title', M.title)), JSON_ARRAY()) AS movies " +
                            "FROM stars AS S " +
                            "LEFT JOIN stars_in_movies AS SIM ON S.id = SIM.starId " +
                            "LEFT JOIN movies AS M ON SIM.movieId = M.id " +
