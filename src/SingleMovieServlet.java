@@ -41,14 +41,14 @@ public class SingleMovieServlet extends HttpServlet {
 
         try (Connection conn = dataSource.getConnection()) {
             String query = "SELECT M.id, M.title, M.year, M.director, R.rating, " +
-                           "JSON_ARRAYAGG(G.name) AS genres, " +
-                           "JSON_ARRAYAGG(JSON_OBJECT('id', S.id, 'name', S.name)) AS stars " +
+                           "COALESCE(JSON_ARRAYAGG(G.name), JSON_ARRAY()) AS genres, " +
+                           "COALESCE(JSON_ARRAYAGG(JSON_OBJECT('id', S.id, 'name', S.name)), JSON_ARRAY()) AS stars " +
                            "FROM movies AS M " +
-                           "INNER JOIN genres_in_movies AS GIM ON M.id = GIM.movieId " +
-                           "INNER JOIN genres AS G ON GIM.genreId = G.id " +
-                           "INNER JOIN stars_in_movies AS SIM ON M.id = SIM.movieId " +
-                           "INNER JOIN stars AS S ON SIM.starId = S.id " +
-                           "INNER JOIN ratings AS R ON M.id = R.movieId " +
+                           "LEFT JOIN genres_in_movies AS GIM ON M.id = GIM.movieId " +
+                           "LEFT JOIN genres AS G ON GIM.genreId = G.id " +
+                           "LEFT JOIN stars_in_movies AS SIM ON M.id = SIM.movieId " +
+                           "LEFT JOIN stars AS S ON SIM.starId = S.id " +
+                           "LEFT JOIN ratings AS R ON M.id = R.movieId " +
                            "WHERE M.id = ? " +
                            "GROUP BY M.id, M.title, M.year, M.director, R.rating";
 
