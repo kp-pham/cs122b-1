@@ -28,7 +28,7 @@ function handleResult(resultData) {
         let row = `
             <tr>
                 <td>${movie["title"]}</td>
-                <td>${movie["birthYear"]}</td>
+                <td>${movie["year"]}</td>
                 <td>${movie["director"]}</td>
             </tr>
         `;
