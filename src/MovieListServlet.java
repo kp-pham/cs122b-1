@@ -40,7 +40,7 @@ public class MovieListServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         try (Connection conn = dataSource.getConnection()) {
-            String query = "SELECT M.id, M.title, M.year, M.director, R.rating " +
+            String query = "SELECT M.id, M.title, M.year, M.director, R.rating, " +
                            "COALESCE(JSON_ARRAYAGG(G.name), JSON_ARRAY()) AS genres, " +
                            "COALESCE(JSON_ARRAYAGG(JSON_OBJECT('id', S.id, 'name', S.name)), JSON_ARRAY()) AS stars " +
                            "FROM movies AS M " +
@@ -49,6 +49,7 @@ public class MovieListServlet extends HttpServlet {
                            "LEFT JOIN stars_in_movies AS SIM ON M.id = SIM.movieId " +
                            "LEFT JOIN stars AS S ON SIM.starId = S.id " +
                            "LEFT JOIN ratings AS R ON M.id = R.movieId " +
+                           "GROUP BY M.id, M.title, M.year, M.director, R.rating " +
                            "ORDER BY R.rating DESC " +
                            "LIMIT 20";
 
@@ -67,14 +68,20 @@ public class MovieListServlet extends HttpServlet {
                 jsonObject.addProperty("director", rs.getString("M.director"));
                 jsonObject.addProperty("rating", rs.getString("R.rating"));
 
-                JsonArray genresArray = JsonParser.parseString(rs.getString("genres"));
+                JsonArray genresArray = JsonParser.parseString(rs.getString("genres")).getAsJsonArray();
                 jsonObject.add("genres", genresArray);
 
-                JsonArray starsArray = JsonParser.parseString(rs.getString("stars"));
+                JsonArray starsArray = JsonParser.parseString(rs.getString("stars")).getAsJsonArray();
                 jsonObject.add("stars", starsArray);
 
                 jsonArray.add(jsonObject);
             }
+
+            rs.close();
+            statement.close();
+
+            out.write(jsonArray.toString());
+            response.setStatus(200);
 
         } catch (Exception e) {
             JsonObject jsonObject = new JsonObject();
