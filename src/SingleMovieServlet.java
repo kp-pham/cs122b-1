@@ -75,6 +75,9 @@ public class SingleMovieServlet extends HttpServlet {
             rs.close();
             statement.close();
 
+            out.write(jsonObject.toString());
+            response.setStatus(200);
+
         } catch (Exception e) {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("errorMessage", e.getMessage());
