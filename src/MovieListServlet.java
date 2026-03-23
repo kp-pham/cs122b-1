@@ -16,7 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-@WebServlet(name = "MovieListServlet", urlPatterns="/")
+@WebServlet(name = "MovieListServlet", urlPatterns="/api/")
 public class MovieListServlet extends HttpServlet {
     private static final long serialVersionUID = 2L;
 
